@@ -1,0 +1,12 @@
+language: go
+sudo: false
+go:
+   - 1.6
+   - 1.7
+   - 1.8
+   - tip
+script:
+  - go get -v -u github.com/ma6174/myhttpdns
+  - myhttpdns -bind "127.0.0.1:8053" &
+  - sleep 0.1
+  - dig +short @127.0.0.1 -p 8053 google.com
