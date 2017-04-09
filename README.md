@@ -2,6 +2,8 @@
 
 DNS 服务器，接收标准 DNS 查询请求，然后通过查询 http dns 获取结果返回给客户端。
 
+[![Build Status](https://travis-ci.org/ma6174/qmongo.svg?branch=master)](https://travis-ci.org/ma6174/qmongo)
+
 ### 主要特性
 
 1. 对外通过 http dns 查询，避免 DNS 劫持
