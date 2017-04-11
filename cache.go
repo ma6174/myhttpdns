@@ -30,9 +30,6 @@ func (h *TTLHeap) Push(x interface{}) {
 func (h *TTLHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
-	if n == 0 {
-		return nil
-	}
 	x := old[n-1]
 	*h = old[0 : n-1]
 	return x
@@ -54,7 +51,7 @@ type RecordCache struct {
 func (r *RecordCache) Put(info *TTLInfo) {
 	r.lock.Lock()
 	r.cache[info.Domain] = info
-	r.heap.Push(info)
+	heap.Push(r.heap, info)
 	r.lock.Unlock()
 }
 
@@ -70,20 +67,19 @@ func (r *RecordCache) Get(domain string) *TTLInfo {
 func (r *RecordCache) loopEvict() {
 	for {
 		r.lock.Lock()
-		i := r.heap.Pop()
-		if i == nil {
+		if r.heap.Len() == 0 {
 			r.lock.Unlock()
-			time.Sleep(time.Millisecond * 500)
+			time.Sleep(time.Second)
 			continue
 		}
-		info := i.(*TTLInfo)
+		info := heap.Pop(r.heap).(*TTLInfo)
 		sleepTime := info.TTLTo.Sub(time.Now())
 		if sleepTime > time.Second {
-			r.heap.Push(info)
+			heap.Push(r.heap, info)
 			r.lock.Unlock()
-			time.Sleep(time.Millisecond * 500)
+			time.Sleep(time.Second)
 			continue
-		} else if sleepTime < 0 {
+		} else if sleepTime <= 0 {
 			delete(r.cache, info.Domain)
 			r.lock.Unlock()
 			continue
