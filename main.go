@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/golang/groupcache/singleflight"
@@ -49,11 +50,12 @@ func (s *CachedHandler) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 		start  time.Time = time.Now()
 	)
 	defer func() {
+		from := strings.Split(w.RemoteAddr().String(), ":")[0]
 		if info.Err != nil {
-			log.Printf("%v\t%v\t%v", w.RemoteAddr(), domain, info.Err)
+			log.Printf("%v\t%d\t%v\t%v", from, s.cache.Len(), domain, info.Err)
 			return
 		}
-		log.Printf("%v\t%vs\t%.3fms\t%v\t%v", w.RemoteAddr(),
+		log.Printf("%v\t%d\t%vs\t%.3fms\t%v\t%v", from, s.cache.Len(),
 			ttl, time.Since(start).Seconds()*1000, domain, info.Records)
 	}()
 	info = s.cache.Get(domain)

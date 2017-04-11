@@ -64,6 +64,12 @@ func (r *RecordCache) Get(domain string) *TTLInfo {
 	return nil
 }
 
+func (r *RecordCache) Len() int {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+	return len(r.cache)
+}
+
 func (r *RecordCache) loopEvict() {
 	for {
 		r.lock.Lock()
