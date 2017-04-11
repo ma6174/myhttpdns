@@ -51,6 +51,7 @@ func (s *CachedHandler) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 	)
 	defer func() {
 		from := strings.Split(w.RemoteAddr().String(), ":")[0]
+		domain = domain[:len(domain)-1]
 		if info.Err != nil {
 			log.Printf("%v\t%d\t%v\t%v", from, s.cache.Len(), domain, info.Err)
 			return
