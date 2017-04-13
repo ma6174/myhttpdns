@@ -40,6 +40,7 @@ type TTLInfo struct {
 	TTLTo   time.Time
 	Records []string
 	Err     error
+	TTL     uint32
 }
 
 type RecordCache struct {

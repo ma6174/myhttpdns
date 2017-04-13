@@ -62,5 +62,6 @@ func (d *DnspodCli) Query(domain string) (info *TTLInfo) {
 		ttl = 3
 	}
 	info.TTLTo = time.Now().Add(time.Duration(ttl) * time.Second)
+	info.TTL = uint32(ttl)
 	return
 }
