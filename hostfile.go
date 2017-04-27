@@ -4,12 +4,23 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"path"
+	"strconv"
 	"strings"
 )
 
-type Hosts map[string]net.IP
+type ipTtl struct {
+	IP  net.IP
+	TTL uint32
+}
+
+type Hosts map[string]ipTtl
 
 func ParseHost(filename string, hosts Hosts) {
+	ttl, err := strconv.Atoi(strings.Replace(path.Ext(filename), ".", "", -1))
+	if err != nil || ttl == 0 {
+		ttl = 600
+	}
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println("[WARN] open hosts fila failed", err)
@@ -28,10 +39,7 @@ func ParseHost(filename string, hosts Hosts) {
 			continue
 		}
 		for _, domain := range fields[1:] {
-			if _, ok := hosts[domain]; ok {
-				continue
-			}
-			hosts[domain] = ip
+			hosts[domain] = ipTtl{IP: ip, TTL: uint32(ttl)}
 		}
 	}
 }

@@ -61,11 +61,11 @@ func (s *CachedHandler) GetFromHostFile(domain string) *TTLInfo {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 	d := domain[:len(domain)-1]
-	if ip, ok := s.hosts[d]; ok {
+	if ipTtl, ok := s.hosts[d]; ok {
 		return &TTLInfo{
-			Records: []string{ip.String()},
-			TTL:     600,
-			TTLTo:   time.Now().Add(time.Second * 601),
+			Records: []string{ipTtl.IP.String()},
+			TTL:     ipTtl.TTL,
+			TTLTo:   time.Now().Add(time.Second * time.Duration(ipTtl.TTL+1)),
 			Domain:  domain,
 		}
 	}
