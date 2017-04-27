@@ -98,6 +98,16 @@ func (s *CachedHandler) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 		log.Printf("%v\t%d\t%vs\t%.3fms\t%v\t%v", from, s.cache.Len(),
 			info.TTL, time.Since(start).Seconds()*1000, domain, info.Records)
 	}()
+	if domain == "myip." {
+		from := strings.Split(w.RemoteAddr().String(), ":")[0]
+		info = &TTLInfo{
+			Domain:  domain,
+			Records: []string{from},
+			TTL:     30,
+			TTLTo:   time.Now().Add(time.Second * 31),
+		}
+		return
+	}
 	info = s.GetFromHostFile(domain)
 	if info != nil {
 		return
