@@ -82,6 +82,9 @@ func (s *CachedHandler) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 		domain string    = r.Question[0].Name
 	)
 	defer func() {
+		if info == nil {
+			return
+		}
 		m := s.genReply(info)
 		m.SetReply(r)
 		err := w.WriteMsg(m)
