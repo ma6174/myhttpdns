@@ -2,12 +2,12 @@
 
 DNS 服务器，接收标准 DNS 查询请求，然后通过查询 http dns 获取结果返回给客户端。
 
-[![Build Status](https://travis-ci.org/ma6174/qmongo.svg?branch=master)](https://travis-ci.org/ma6174/qmongo)
+[![Build Status](https://travis-ci.org/ma6174/myhttpdns.svg?branch=master)](https://travis-ci.org/ma6174/myhttpdns)
 
 ### 主要特性
 
 1. 对外通过 http dns 查询，避免 DNS 劫持
-2. 提供标准 DNS 查询接口，可以直接将机器的 dns 配置到 cooldns
+2. 提供标准 DNS 查询接口，可以直接将机器的 dns 配置到 myhttpdns
 3. DNS 查询结果根据 TTL 进行缓存
 4. 对外 DNS 查询请求归并
 5. 提供详细的审计日志，包括请求来源 IP、缓存个数、请求的域名、TTL、响应时间以及解析结果
