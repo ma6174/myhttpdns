@@ -1,0 +1,6 @@
+package: github.com/ma6174/myhttpdns
+import:
+- package: github.com/golang/groupcache
+  subpackages:
+  - singleflight
+- package: github.com/miekg/dns
