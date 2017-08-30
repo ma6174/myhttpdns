@@ -85,6 +85,10 @@ func (s *CachedHandler) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 		if info == nil {
 			return
 		}
+		// limit message less than 512 bytes. https://www.ietf.org/rfc/rfc1035.txt
+		if len(info.Records) > 10 {
+			info.Records = info.Records[:10]
+		}
 		m := s.genReply(info)
 		m.SetReply(r)
 		err := w.WriteMsg(m)
