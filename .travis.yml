@@ -1,9 +1,9 @@
 language: go
 sudo: required
 go:
-   - 1.6
    - 1.7
    - 1.8
+   - 1.9
    - tip
 before_install:
   - sudo apt-get update
