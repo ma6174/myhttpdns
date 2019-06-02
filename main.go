@@ -15,10 +15,11 @@ import (
 func main() {
 	bind := flag.String("bind", "0.0.0.0:53", "server bind addr")
 	hostfiless := flag.String("hosts", "/etc/hosts", "hosts file, file1,file2,file3...")
+	dnspod := flag.Bool("dnspod", false, "use dnspod")
 	flag.Parse()
 	log.Println("dns server running at", *bind)
 	server := &dns.Server{Addr: *bind, Net: "udp"}
-	handler := NewCacheHandler(strings.Split(*hostfiless, ","))
+	handler := NewCacheHandler(strings.Split(*hostfiless, ","), *dnspod)
 	dns.HandleFunc(".", handler.handleRequest)
 	log.Fatal(server.ListenAndServe())
 }
@@ -27,12 +28,16 @@ type DnsQueryer interface {
 	Query(domain string) *TTLInfo
 }
 
-func NewCacheHandler(hostfiles []string) *CachedHandler {
+func NewCacheHandler(hostfiles []string, useDnspod bool) *CachedHandler {
 	hosts := ParseHostsFiles(hostfiles)
 	log.Printf("load %d hosts from hosts file", len(hosts))
+	cli := NewCloudflareCli(time.Second)
+	if useDnspod {
+		cli = NewDnspodCli(time.Second)
+	}
 	ch := &CachedHandler{
 		cache:   NewRecordCache(),
-		backend: NewDnspodCli(time.Second * 3),
+		backend: cli,
 		group:   &singleflight.Group{},
 		hosts:   hosts,
 	}
