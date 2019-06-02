@@ -31,9 +31,13 @@ type DnsQueryer interface {
 func NewCacheHandler(hostfiles []string, useDnspod bool) *CachedHandler {
 	hosts := ParseHostsFiles(hostfiles)
 	log.Printf("load %d hosts from hosts file", len(hosts))
-	cli := NewCloudflareCli(time.Second)
+	var cli DnsQueryer
 	if useDnspod {
+		log.Println("use dnspod")
 		cli = NewDnspodCli(time.Second)
+	} else {
+		log.Println("use cloudflare")
+		cli = NewCloudflareCli(time.Second)
 	}
 	ch := &CachedHandler{
 		cache:   NewRecordCache(),
