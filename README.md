@@ -14,6 +14,7 @@ DNS 服务器，接收标准 DNS 查询请求，然后通过查询 http dns 获�
 6. 支持 hosts 文件与本地文件，可以通过文件名设置 TTL，比如 `hosts.600` 设置 TTL 为 600 秒
 7. http dns 查询失败改用默认的 DNS 查询
 8. 请求domain 为 `myip` 返回客户端的来源 IP
+9. 支持 Dnspod 和 Cloudflare 两家 dns
 
 
 ### 如何安装
