@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-func NewCloudflareCli(timeout time.Duration) *DnspodCli {
-	return &DnspodCli{
+func NewCloudflareCli(timeout time.Duration) DnsQueryer {
+	return &cloudflareCli{
 		cli: &http.Client{Timeout: timeout},
 	}
 }
@@ -56,9 +56,16 @@ func (d *cloudflareCli) Query(domain string) (info *TTLInfo) {
 	query.Set("name", domain)
 	query.Set("type", "A")
 	u := "https://1.1.1.1/dns-query?" + query.Encode()
-	resp, err := d.cli.Get(u)
+	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
-		log.Println(err)
+		log.Println("req", err)
+		info.Err = err
+		return
+	}
+	req.Header.Set("accept", "application/dns-json")
+	resp, err := d.cli.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		log.Println("get", err)
 		info.Err = err
 		return
 	}
@@ -66,7 +73,7 @@ func (d *cloudflareCli) Query(domain string) (info *TTLInfo) {
 	var ret CloudflareDnsRet
 	err = json.NewDecoder(resp.Body).Decode(&ret)
 	if err != nil {
-		log.Println(err)
+		log.Println("decode", err)
 		info.Err = err
 		return
 	}
@@ -77,6 +84,9 @@ func (d *cloudflareCli) Query(domain string) (info *TTLInfo) {
 		return
 	}
 	for _, ans := range ret.Answer {
+		if ans.Type != 1 {
+			continue
+		}
 		if ans.TTL > 3600 {
 			ans.TTL = 3600
 		}
@@ -84,7 +94,7 @@ func (d *cloudflareCli) Query(domain string) (info *TTLInfo) {
 			ans.TTL = 3
 		}
 		info.TTL = ans.TTL
-		info.Domain = ans.Name
+		info.Domain = domain + "."
 		info.TTLTo = time.Now().Add(time.Second * time.Duration(ans.TTL))
 		info.Records = append(info.Records, ans.Data)
 	}

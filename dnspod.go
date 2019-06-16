@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func NewDnspodCli(timeout time.Duration) *DnspodCli {
+func NewDnspodCli(timeout time.Duration) DnsQueryer {
 	return &DnspodCli{
 		cli: &http.Client{Timeout: timeout},
 	}
